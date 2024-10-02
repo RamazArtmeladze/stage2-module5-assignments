@@ -11,56 +11,73 @@ import assignments.annotations.ReadFullProcessorNameAnnotation;
 
 public class LocalProcessor {
     private String processorName;
-    private Long period;
-    private String processorVersion;
+    private Long period = 10000000000000L;
+    private String processorVersion; // Changed from `ProcessorVersion` to `processorVersion`
     private Integer valueOfCheap;
-    private Scanner informationScanner;
-    private LinkedList<String> stringArrayList;
+    private Scanner informationScanner; // Changed from `informationscanner` to `informationScanner`
+    private static LinkedList<String> stringArrayList = new LinkedList<>();
 
     public LocalProcessor(String processorName, Long period, String processorVersion, Integer valueOfCheap,
                           Scanner informationScanner, LinkedList<String> stringArrayList) {
         this.processorName = processorName;
         this.period = period;
-        this.processorVersion = processorVersion;
+        this.processorVersion = processorVersion; // Changed to match field name
         this.valueOfCheap = valueOfCheap;
-        this.informationScanner = informationScanner;
-        this.stringArrayList = stringArrayList;
+        this.informationScanner = informationScanner; // Changed to match field name
+        LocalProcessor.stringArrayList = stringArrayList; // Static field access
     }
 
     public LocalProcessor() {
-        this.period = 10000000000000L; // Default value
-        this.stringArrayList = new LinkedList<>(); // Initialize list
     }
 
     @ListIteratorAnnotation
     public void listIterator(LinkedList<String> stringList) {
-        stringArrayList.clear(); // Clear existing list before populating
-        stringArrayList.addAll(stringList); // Use addAll for clarity
-        for (int i = 0; i < Math.min(period, stringArrayList.size()); i++) { // Ensure no index out of bounds
+        stringArrayList = new LinkedList<>(stringList);
+        for (int i = 0; i < stringArrayList.size(); i++) {
             System.out.println(stringArrayList.get(i).hashCode());
         }
     }
 
     @FullNameProcessorGeneratorAnnotation
-    public String fullNameProcessorGenerator() {
-        StringBuilder fullName = new StringBuilder();
-        for (String name : stringArrayList) { // Enhanced for-loop for readability
-            fullName.append(name).append(' ');
+    public String fullNameProcessorGenerator(LinkedList<String> stringList) {
+        processorName = ""; // Initialize to avoid appending on each call
+        for (String name : stringList) {
+            processorName += name + ' ';
         }
-        processorName = fullName.toString().trim(); // Trim trailing whitespace
-        return processorName;
+        return processorName.trim(); // Trim trailing space
     }
 
     @ReadFullProcessorNameAnnotation
-    public void readFullProcessorName(File file) {
-        try (Scanner scanner = new Scanner(file)) { // Use try-with-resources for automatic resource management
-            StringBuilder versionBuilder = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                versionBuilder.append(scanner.nextLine()).append(System.lineSeparator()); // Append new line for clarity
-            }
-            processorVersion = versionBuilder.toString().trim(); // Trim trailing whitespace
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found: " + e.getMessage()); // Basic error handling
+    public void readFullProcessorName(File file) throws FileNotFoundException {
+        informationScanner = new Scanner(file);
+        StringBuilder versionBuilder = new StringBuilder();
+        while (informationScanner.hasNextLine()) {
+            versionBuilder.append(informationScanner.nextLine()).append(System.lineSeparator());
         }
+        processorVersion = versionBuilder.toString().trim(); // Save version without trailing newline
+    }
+
+    public String getProcessorName() {
+        return processorName;
+    }
+
+    public Long getPeriod() {
+        return period;
+    }
+
+    public String getProcessorVersion() {
+        return processorVersion;
+    }
+
+    public Integer getValueOfCheap() {
+        return valueOfCheap;
+    }
+
+    public Scanner getInformationScanner() {
+        return informationScanner;
+    }
+
+    public static LinkedList<String> getStringArrayList() {
+        return stringArrayList;
     }
 }
